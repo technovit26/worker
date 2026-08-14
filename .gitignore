@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# wrangler
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# env
+.env
+.env.*
+
+# misc
+.DS_Store
+*.log

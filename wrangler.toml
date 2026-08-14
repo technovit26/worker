@@ -1,0 +1,17 @@
+name = "technovit-cms-worker"
+main = "src/index.ts"
+compatibility_date = "2024-05-29"
+
+[observability]
+enabled = true
+
+[[r2_buckets]]
+binding = "cms_assets"
+bucket_name = "technovit-cms-assets"
+preview_bucket_name = "technovit-cms-assets-preview"
+
+[[d1_databases]]
+binding = "cms_db"
+database_name = "technovit-cms-db"
+database_id = "04c903ad-982f-427e-900d-e67285abbeb3"
+preview_database_id = "04c903ad-982f-427e-900d-e67285abbeb3"
