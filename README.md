@@ -30,6 +30,18 @@ bun run deploy   # wrangler deploy
 `wrangler.toml` binds the `cms_assets` R2 bucket and `cms_db` D1 database.
 Run `schema.sql` against the D1 database to create the `events` table.
 
+## Migrations
+
+Schema changes after the initial `schema.sql` live in `migrations/`,
+applied in order and never re-run. Apply a new one against the remote
+database with:
+
+```bash
+npx wrangler d1 execute technovit-cms-db --remote --file=migrations/0001_add_faculty_coordinator.sql
+```
+
+Drop `--remote` to apply it to your local dev database instead.
+
 ## Scripts
 
 - `bun run dev` — local dev via `wrangler dev`

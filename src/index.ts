@@ -83,14 +83,16 @@ export default {
                         event_name, club_name, event_type, event_for, poster_path,
                         start_date_time, end_date_time, price_per_person, participation_type,
                         event_venue, short_description, long_description, is_special_event,
-                        registration_link, team_size
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        registration_link, team_size, faculty_coord_emp_id, faculty_coord_name,
+                        faculty_coord_mobile, faculty_coord_email
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `;
                 const result = await env.cms_db.prepare(query).bind(
                     data.event_name, data.club_name, data.event_type, data.event_for, data.poster_path,
                     data.start_date_time, data.end_date_time, data.price_per_person, data.participation_type,
                     data.event_venue, data.short_description, data.long_description, data.is_special_event,
-                    data.registration_link, data.team_size
+                    data.registration_link, data.team_size, data.faculty_coord_emp_id, data.faculty_coord_name,
+                    data.faculty_coord_mobile, data.faculty_coord_email
                 ).run();
                 return Response.json({ success: true, id: result.meta.last_row_id }, { headers: corsHeaders });
             } catch (err) {
@@ -108,14 +110,16 @@ export default {
                         event_name = ?, club_name = ?, event_type = ?, event_for = ?, poster_path = ?,
                         start_date_time = ?, end_date_time = ?, price_per_person = ?, participation_type = ?,
                         event_venue = ?, short_description = ?, long_description = ?, is_special_event = ?,
-                        registration_link = ?, team_size = ?
+                        registration_link = ?, team_size = ?, faculty_coord_emp_id = ?, faculty_coord_name = ?,
+                        faculty_coord_mobile = ?, faculty_coord_email = ?
                     WHERE id = ?
                 `;
                 await env.cms_db.prepare(query).bind(
                     data.event_name, data.club_name, data.event_type, data.event_for, data.poster_path,
                     data.start_date_time, data.end_date_time, data.price_per_person, data.participation_type,
                     data.event_venue, data.short_description, data.long_description, data.is_special_event,
-                    data.registration_link, data.team_size, id
+                    data.registration_link, data.team_size, data.faculty_coord_emp_id, data.faculty_coord_name,
+                    data.faculty_coord_mobile, data.faculty_coord_email, id
                 ).run();
                 return Response.json({ success: true }, { headers: corsHeaders });
             } catch (err) {

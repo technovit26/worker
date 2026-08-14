@@ -16,6 +16,10 @@ CREATE TABLE events (
   long_description TEXT,
   is_special_event BOOLEAN,
   registration_link TEXT,
-  team_size TEXT
+  team_size TEXT,
+  faculty_coord_emp_id TEXT,
+  faculty_coord_name TEXT,
+  faculty_coord_mobile TEXT,
+  faculty_coord_email TEXT
 );
 
