@@ -88,11 +88,11 @@ export default {
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `;
                 const result = await env.cms_db.prepare(query).bind(
-                    data.event_name, data.club_name, data.event_type, data.event_for, data.poster_path,
-                    data.start_date_time, data.end_date_time, data.price_per_person, data.participation_type,
-                    data.event_venue, data.short_description, data.long_description, data.is_special_event,
-                    data.registration_link, data.team_size, data.faculty_coord_emp_id, data.faculty_coord_name,
-                    data.faculty_coord_mobile, data.faculty_coord_email
+                    data.event_name ?? null, data.club_name ?? null, data.event_type ?? null, data.event_for ?? null, data.poster_path ?? null,
+                    data.start_date_time ?? null, data.end_date_time ?? null, data.price_per_person ?? null, data.participation_type ?? null,
+                    data.event_venue ?? null, data.short_description ?? null, data.long_description ?? null, data.is_special_event ?? null,
+                    data.registration_link ?? null, data.team_size ?? null, data.faculty_coord_emp_id ?? null, data.faculty_coord_name ?? null,
+                    data.faculty_coord_mobile ?? null, data.faculty_coord_email ?? null
                 ).run();
                 return Response.json({ success: true, id: result.meta.last_row_id }, { headers: corsHeaders });
             } catch (err) {
@@ -115,11 +115,11 @@ export default {
                     WHERE id = ?
                 `;
                 await env.cms_db.prepare(query).bind(
-                    data.event_name, data.club_name, data.event_type, data.event_for, data.poster_path,
-                    data.start_date_time, data.end_date_time, data.price_per_person, data.participation_type,
-                    data.event_venue, data.short_description, data.long_description, data.is_special_event,
-                    data.registration_link, data.team_size, data.faculty_coord_emp_id, data.faculty_coord_name,
-                    data.faculty_coord_mobile, data.faculty_coord_email, id
+                    data.event_name ?? null, data.club_name ?? null, data.event_type ?? null, data.event_for ?? null, data.poster_path ?? null,
+                    data.start_date_time ?? null, data.end_date_time ?? null, data.price_per_person ?? null, data.participation_type ?? null,
+                    data.event_venue ?? null, data.short_description ?? null, data.long_description ?? null, data.is_special_event ?? null,
+                    data.registration_link ?? null, data.team_size ?? null, data.faculty_coord_emp_id ?? null, data.faculty_coord_name ?? null,
+                    data.faculty_coord_mobile ?? null, data.faculty_coord_email ?? null, id
                 ).run();
                 return Response.json({ success: true }, { headers: corsHeaders });
             } catch (err) {
