@@ -8,7 +8,12 @@ event data (D1) and media storage (R2), served behind one HTTP API.
 - Serves uploaded images/videos directly from R2 at `/images/*` and
   `/videos/*`, with HTTP range support for video streaming.
 - Events API (`/events`): list, get, create, update, delete, backed by a
-  D1 `events` table.
+  D1 `events` table. Deleting an event moves its row to `deleted_events`
+  instead of destroying it, so it can be restored.
+- Activity Log API (`/activity-logs`): every create/update/delete/restore
+  on an event is recorded with the actor who made it and what changed.
+  Deletions can be undone via `/activity-logs/:id/undo`, which moves the
+  row back from `deleted_events` into `events`.
 - Media API (`/media`): list uploaded files, upload a new file (auto-sorted
   into `images/photos/` or `videos/`, key-prefixed with a UUID), delete a
   file.
@@ -37,7 +42,7 @@ applied in order and never re-run. Apply a new one against the remote
 database with:
 
 ```bash
-npx wrangler d1 execute technovit-cms-db --remote --file=migrations/0001_add_faculty_coordinator.sql
+npx wrangler d1 execute technovit-cms-db --remote --file=migrations/0002_add_activity_log_and_deleted_events.sql
 ```
 
 Drop `--remote` to apply it to your local dev database instead.
