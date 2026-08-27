@@ -91,33 +91,45 @@ export default {
 
         // --- Route 1: Serve Assets (Images/Videos) ---
         if (request.method === 'GET' && (url.pathname.startsWith('/images/') || url.pathname.startsWith('/videos/'))) {
+            const hasRange = request.headers.has('range');
+
+            // Full-object requests (the common case — poster thumbnails, modal
+            // previews) are cached at Cloudflare's edge so repeat views of the
+            // same asset never touch R2 or this Worker again. Range requests
+            // (video seeking) always go straight to R2 since we can't safely
+            // slice a cached entry.
+            if (!hasRange) {
+                const cached = await caches.default.match(request);
+                if (cached) return cached;
+            }
+
             const key = decodeURIComponent(url.pathname.slice(1));
 
-            // 1. Get file metadata
-            const objectHead = await env.cms_assets.head(key);
-            if (!objectHead) return new Response('File Not Found', { status: 404, headers: corsHeaders });
-
-            // 2. Handle Range Requests (Video Streaming)
-            const rangeHeader = request.headers.get('range');
-            const range = rangeHeader ? parseRange(rangeHeader, objectHead.size) : undefined;
-
+            // R2 parses the Range header itself, so a single get() covers both
+            // full and ranged reads — no separate head() call needed for size.
             const object = await env.cms_assets.get(key, {
-                range: range ? { offset: range.offset, length: range.length } : undefined
+                range: hasRange ? request.headers : undefined,
             });
-
             if (!object) return new Response('File Not Found', { status: 404, headers: corsHeaders });
 
             const headers = new Headers(corsHeaders);
             object.writeHttpMetadata(headers);
             headers.set('etag', object.httpEtag);
+            headers.set('accept-ranges', 'bytes');
+            headers.set('cache-control', 'public, max-age=31536000, immutable');
 
-            if (range) {
-                headers.set('Content-Range', `bytes ${range.offset}-${range.end}/${objectHead.size}`);
-                headers.set('Content-Length', range.length.toString());
+            if (object.range) {
+                const { offset = 0, length = object.size - offset } = object.range as { offset?: number; length?: number };
+                headers.set('Content-Range', `bytes ${offset}-${offset + length - 1}/${object.size}`);
+                headers.set('Content-Length', length.toString());
                 return new Response(object.body, { headers, status: 206 });
             }
 
-            return new Response(object.body, { headers });
+            const response = new Response(object.body, { headers });
+            if (!hasRange) {
+                ctx.waitUntil(caches.default.put(request, response.clone()));
+            }
+            return response;
         }
 
         // --- Route 2: Events API (Kept the NEW Schema logic so forms work) ---
@@ -405,13 +417,3 @@ export default {
         return new Response('CMS API Running', { headers: corsHeaders });
     },
 };
-
-// Helper for video ranges
-function parseRange(header: string, totalSize: number) {
-    if (!header || !header.startsWith('bytes=')) return undefined;
-    const parts = header.replace('bytes=', '').split('-');
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : totalSize - 1;
-    const chunkSize = end - start + 1;
-    return { offset: start, length: chunkSize, end: end };
-}
